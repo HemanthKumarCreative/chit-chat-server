@@ -6,6 +6,7 @@ require("dotenv").config();
 const signupRouter = require("./routes/signup");
 const loginRouter = require("./routes/login");
 const chatRouter = require("./routes/chats");
+const groupRouter = require("./routes/groups");
 
 const app = express();
 app.use(cors());
@@ -15,6 +16,7 @@ app.use(express.json());
 app.use("/api/signup", signupRouter);
 app.use("/api/login", loginRouter);
 app.use("/api/chats", chatRouter);
+app.use("/api/groups", groupRouter);
 
 // Start server
 const PORT = process.env.PORT || 5000;
