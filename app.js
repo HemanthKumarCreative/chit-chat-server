@@ -4,13 +4,14 @@ const sequelize = require("./database");
 require("dotenv").config();
 
 const signupRouter = require("./routes/signup");
-
+const loginRouter = require("./routes/login");
 const app = express();
 app.use(cors());
 app.use(express.json());
 
 // Routes
 app.use("/api/signup", signupRouter);
+app.use("/api/login", loginRouter);
 
 // Start server
 const PORT = process.env.PORT || 5000;
