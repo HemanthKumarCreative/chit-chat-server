@@ -15,6 +15,10 @@ const Group = sequelize.define("groups", {
     type: DataTypes.ARRAY(DataTypes.STRING),
     allowNull: false,
   },
+  admins: {
+    type: DataTypes.ARRAY(DataTypes.STRING),
+    allowNull: false,
+  },
 });
 
 module.exports = Group;
