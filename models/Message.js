@@ -1,13 +1,21 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../database");
 
-const Chat = sequelize.define("chats", {
-  id: {
+const Message = sequelize.define("messages", {
+  messageId: {
     type: DataTypes.UUID,
     primaryKey: true,
     defaultValue: DataTypes.UUIDV4,
   },
-  user: {
+  groupId: {
+    type: DataTypes.UUID,
+    allowNull: false,
+  },
+  senderId: {
+    type: DataTypes.UUID,
+    allowNull: false,
+  },
+  senderName: {
     type: DataTypes.STRING,
     allowNull: false,
   },
@@ -15,10 +23,6 @@ const Chat = sequelize.define("chats", {
     type: DataTypes.TEXT,
     allowNull: false,
   },
-  groupId: {
-    type: DataTypes.UUID,
-    allowNull: false,
-  },
 });
 
-module.exports = Chat;
+module.exports = Message;

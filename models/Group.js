@@ -2,20 +2,20 @@ const { DataTypes } = require("sequelize");
 const sequelize = require("../database");
 
 const Group = sequelize.define("groups", {
-  id: {
+  groupId: {
     type: DataTypes.UUID,
     primaryKey: true,
     defaultValue: DataTypes.UUIDV4,
   },
-  name: {
+  groupName: {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  members: {
+  groupMembers: {
     type: DataTypes.ARRAY(DataTypes.STRING),
     allowNull: false,
   },
-  admins: {
+  groupAdmins: {
     type: DataTypes.ARRAY(DataTypes.STRING),
     allowNull: false,
   },

@@ -2,12 +2,16 @@ const { DataTypes } = require("sequelize");
 const sequelize = require("../database");
 
 const Invitation = sequelize.define("invitations", {
-  id: {
+  invitationId: {
     type: DataTypes.UUID,
     primaryKey: true,
     defaultValue: DataTypes.UUIDV4,
   },
-  userId: {
+  senderId: {
+    type: DataTypes.UUID,
+    allowNull: false,
+  },
+  recieverId: {
     type: DataTypes.UUID,
     allowNull: false,
   },
@@ -16,6 +20,10 @@ const Invitation = sequelize.define("invitations", {
     allowNull: false,
   },
   groupName: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  invitationStatus: {
     type: DataTypes.STRING,
     allowNull: false,
   },
