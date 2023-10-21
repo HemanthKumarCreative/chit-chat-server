@@ -1,28 +1,46 @@
 const Chat = require("../models/Chat");
 
 const createChat = async (req, res) => {
-  const groupId = req.params.groupId;
   try {
-    const chat = await Chat.create({ ...req.body, groupId });
+    const { body } = req;
 
-    res.status(201).json(chat);
+    // Input Validation
+    if (!body) {
+      return res.status(400).json({ message: "Invalid input" });
+    }
+
+    const chat = await Chat.create(body);
+    return res.status(201).json(chat);
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    console.error(error);
+
+    return res
+      .status(500)
+      .json({ message: "Internal Server Error", error: error.message });
   }
 };
 
-const getChats = async (req, res) => {
-  const groupId = req.params.groupId;
-
+const getChatsByGroupId = async (req, res) => {
   try {
+    const { groupId } = req.params;
+
+    // Input Validation
+    if (!groupId) {
+      return res.status(400).json({ message: "Invalid input" });
+    }
+
     const chats = await Chat.findAll({ where: { groupId } });
-    res.status(200).json(chats);
+    return res.status(200).json(chats);
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    console.error(error);
+
+    return res
+      .status(500)
+      .json({ message: "Internal Server Error", error: error.message });
   }
 };
 
 module.exports = {
   createChat,
-  getChats,
+  getChatsByGroupId,
 };
