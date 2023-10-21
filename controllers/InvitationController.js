@@ -1,69 +1,79 @@
 const Invitation = require("../models/Invitation");
-const Group = require("../models/Group");
 
 const createInvitation = async (req, res) => {
   try {
-    const invitation = await Invitation.create(req.body);
+    const { body } = req;
 
-    res.status(201).json(invitation);
+    // Input Validation
+    if (!body) {
+      return res.status(400).json({ message: "Invalid input" });
+    }
+
+    const invitation = await Invitation.create(body);
+    return res.status(201).json(invitation);
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    console.error(error);
+
+    return res
+      .status(500)
+      .json({ message: "Internal Server Error", error: error.message });
   }
 };
 
-const getInvitations = async (req, res) => {
-  const userId = req.params.userId;
+const getInvitationsByUserId = async (req, res) => {
   try {
+    const { userId } = req.params;
+
+    // Input Validation
+    if (!userId) {
+      return res.status(400).json({ message: "Invalid input" });
+    }
+
     const invitations = await Invitation.findAll({
       where: { userId },
     });
-    res.status(200).json(invitations);
+    return res.status(200).json(invitations);
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    console.error(error);
+
+    return res
+      .status(500)
+      .json({ message: "Internal Server Error", error: error.message });
   }
 };
 
-const acceptInvitation = async (req, res) => {
-  const invitationId = req.params.invitationId;
+const respondToInvitation = async (req, res) => {
   try {
+    const { invitationId } = req.params;
+    const { status } = req.body;
+
+    // Input Validation
+    if (!invitationId || !status) {
+      return res.status(400).json({ message: "Invalid input" });
+    }
+
     const invitation = await Invitation.findByPk(invitationId);
 
     if (!invitation) {
       return res.status(404).json({ message: "Invitation Not Found" });
     }
 
-    const groupId = invitation.groupId;
-    const userId = invitation.userId;
-    const group = await Group.findByPk(groupId);
-    const members = group.members;
-    await group.update({ members: [...members, userId] });
+    await invitation.update({ invitationStatus: status });
 
-    await invitation.destroy();
-    res.status(200).json({ message: "Invitation deleted successfully" });
-  } catch (err) {
-    console.error(err);
-  }
-};
+    return res
+      .status(200)
+      .json({ message: `Invitation ${status} successfully` });
+  } catch (error) {
+    console.error(error);
 
-const rejectInvitation = async (req, res) => {
-  const invitationId = req.params.invitationId;
-  try {
-    const invitation = await Invitation.findByPk(invitationId);
-
-    if (!invitation) {
-      return res.status(404).json({ message: "Invitation Not Found" });
-    }
-
-    await invitation.destroy();
-    res.status(200).json({ message: "Invitation deleted successfully" });
-  } catch (err) {
-    console.error(err);
+    return res
+      .status(500)
+      .json({ message: "Internal Server Error", error: error.message });
   }
 };
 
 module.exports = {
   createInvitation,
-  getInvitations,
-  acceptInvitation,
-  rejectInvitation,
+  getInvitationsByUserId,
+  respondToInvitation,
 };
