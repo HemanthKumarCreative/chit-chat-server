@@ -1,76 +1,154 @@
+const { Op } = require("sequelize");
 const Group = require("../models/Group");
-const Sequelize = require("sequelize");
+
 const createGroup = async (req, res) => {
   try {
-    const group = await Group.create(req.body);
+    const { body } = req;
 
-    res.status(201).json(group);
+    // Input Validation
+    if (!body) {
+      return res.status(400).json({ message: "Invalid input" });
+    }
+
+    const group = await Group.create(body);
+
+    return res.status(201).json(group);
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    console.error(error);
+
+    return res
+      .status(500)
+      .json({ message: "Internal Server Error", error: error.message });
   }
 };
 
-const getGroupsByUserId = async (userId) => {
+const getGroupsByUserId = async (req, res) => {
   try {
+    const { userId } = req.params;
+
+    // Input Validation
+    if (!userId) {
+      return res.status(400).json({ message: "Invalid input" });
+    }
+
     const groups = await Group.findAll({
       where: {
-        members: {
-          [Sequelize.Op.contains]: [userId], // Assuming members is an array field
+        groupMembers: {
+          [Op.contains]: [userId],
         },
       },
     });
 
-    return groups;
+    return res.status(200).json(groups);
   } catch (error) {
     console.error(error);
-    throw new Error("Error fetching groups by user ID");
+
+    return res
+      .status(500)
+      .json({ message: "Internal Server Error", error: error.message });
   }
 };
 
-const getGroups = async (req, res) => {
-  const userId = req.params.userId;
+const getGroupByGroupId = async (req, res) => {
   try {
-    const groups = await getGroupsByUserId(userId);
+    const { groupId } = req.params;
 
-    res.status(200).json(groups);
+    // Input Validation
+    if (!groupId) {
+      return res.status(400).json({ message: "Invalid input" });
+    }
+
+    const group = await Group.findByPk(groupId);
+
+    if (group) {
+      return res.status(200).json(group);
+    }
+
+    return res.status(404).json({ message: "Group not found" });
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    console.error(error);
+
+    return res
+      .status(500)
+      .json({ message: "Internal Server Error", error: error.message });
   }
 };
 
-const getGroup = async (req, res) => {
-  const groupId = req.params.groupId;
+const addUserAsGroupAdmin = async (req, res) => {
   try {
-    const group = await Group.findByPk(groupId);
-    res.status(200).json(group);
-  } catch (err) {
-    console.error(err);
-  }
-};
+    const { groupId } = req.params;
+    const { userId } = req.body;
 
-const putGroup = async (req, res) => {
-  const groupId = req.params.groupId;
-  const userId = req.body.userId;
-  try {
+    // Input Validation
+    if (!groupId || !userId) {
+      return res.status(400).json({ message: "Invalid input" });
+    }
+
     const group = await Group.findByPk(groupId);
+
     if (!group) {
-      throw new Error("Group not found");
+      return res.status(404).json({ message: "Group not found" });
     }
-    const { admins } = group;
-    if (!admins.includes(userId)) {
-      await group.update({ admins: [...admins, userId] });
-      res.status(201).json({ message: "Admin Added" });
-    } else {
-      console.log("User is already an admin.");
+
+    const { groupAdmins } = group;
+
+    if (Array.isArray(groupAdmins) && !groupAdmins.includes(userId)) {
+      await group.update({ groupAdmins: [...groupAdmins, userId] });
+      return res.status(201).json({ message: "User added as group admin" });
     }
+
+    return res.status(200).json({ message: "User is already a group admin" });
   } catch (error) {
-    console.error("Error:", error.message);
+    console.error(error);
+
+    return res
+      .status(500)
+      .json({ message: "Internal Server Error", error: error.message });
+  }
+};
+
+const removeUserFromGroup = async (req, res) => {
+  try {
+    const { groupId, userId } = req.params;
+
+    // Input Validation
+    if (!groupId || !userId) {
+      return res.status(400).json({ message: "Invalid input" });
+    }
+
+    const group = await Group.findByPk(groupId);
+
+    if (!group) {
+      return res.status(404).json({ message: "Group not found" });
+    }
+
+    const { groupMembers } = group;
+
+    if (Array.isArray(groupMembers) && groupMembers.includes(userId)) {
+      const updatedGroupMembers = groupMembers.filter(
+        (memberId) => memberId !== userId
+      );
+
+      await group.update({ groupMembers: updatedGroupMembers });
+      return res.status(201).json({ message: "User removed from the group" });
+    }
+
+    return res
+      .status(200)
+      .json({ message: "User is already removed from the group" });
+  } catch (error) {
+    console.error(error);
+
+    return res
+      .status(500)
+      .json({ message: "Internal Server Error", error: error.message });
   }
 };
 
 module.exports = {
   createGroup,
-  getGroups,
-  getGroup,
-  putGroup,
+  getGroupsByUserId,
+  getGroupByGroupId,
+  addUserAsGroupAdmin,
+  removeUserFromGroup,
 };
