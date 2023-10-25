@@ -4,23 +4,24 @@ const jwt = require("jsonwebtoken");
 require("dotenv").config();
 
 const signup = async (req, res) => {
-  const { name, email, mobile, password } = req.body;
+  const { userName, userEmail, userMobile, userPassword } = req.body;
 
   try {
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hash(userPassword, 10);
 
     const user = await User.create({
-      name,
-      email,
-      mobile,
-      password: hashedPassword,
+      userName,
+      userEmail,
+      userMobile,
+      userPassword: hashedPassword,
+      userGroups: [],
     });
     await user.update({ isSignedIn: true });
 
-    const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, {
+    const token = jwt.sign({ userId: user.userId }, process.env.JWT_SECRET, {
       expiresIn: "1h",
     });
-    user.id = token;
+    user.userId = token;
 
     res.cookie("token", token, { httpOnly: true });
 

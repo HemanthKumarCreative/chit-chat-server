@@ -4,15 +4,18 @@ const jwt = require("jsonwebtoken");
 require("dotenv").config();
 
 const login = async (req, res) => {
-  const { email, password } = req.body;
+  const { userEmail, userPassword } = req.body;
   try {
-    const user = await User.findOne({ where: { email } });
+    const user = await User.findOne({ where: { userEmail } });
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    const isPasswordValid = await bcrypt.compare(password, user.password);
+    const isPasswordValid = await bcrypt.compare(
+      userPassword,
+      user.userPassword
+    );
 
     if (!isPasswordValid) {
       return res.status(401).json({ message: "Invalid password" });

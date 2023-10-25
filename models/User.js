@@ -33,6 +33,10 @@ const User = sequelize.define("users", {
     type: DataTypes.STRING,
     allowNull: true,
   },
+  userGroups: {
+    type: DataTypes.ARRAY(DataTypes.STRING),
+    allowNull: false,
+  },
 });
 
 module.exports = User;

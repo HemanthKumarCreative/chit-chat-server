@@ -5,19 +5,23 @@ require("dotenv").config();
 
 const signupRouter = require("./routes/signup");
 const loginRouter = require("./routes/login");
-const chatRouter = require("./routes/chats");
+const messageRouter = require("./routes/messages");
 const groupRouter = require("./routes/groups");
 const invitationRouter = require("./routes/invitations");
 const userRouter = require("./routes/users");
 
 const app = express();
-app.use(cors("*"));
+app.use(
+  cors({
+    origin: "*",
+  })
+);
 app.use(express.json());
 
 // Routes
 app.use("/api/signup", signupRouter);
 app.use("/api/login", loginRouter);
-app.use("/api/chats", chatRouter);
+app.use("/api/messages", messageRouter);
 app.use("/api/groups", groupRouter);
 app.use("/api/invitations", invitationRouter);
 app.use("/api/users", userRouter);

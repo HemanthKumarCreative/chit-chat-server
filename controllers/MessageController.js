@@ -1,6 +1,6 @@
-const Chat = require("../models/Chat");
+const Message = require("../models/Message");
 
-const createChat = async (req, res) => {
+const createMessage = async (req, res) => {
   try {
     const { body } = req;
 
@@ -9,8 +9,8 @@ const createChat = async (req, res) => {
       return res.status(400).json({ message: "Invalid input" });
     }
 
-    const chat = await Chat.create(body);
-    return res.status(201).json(chat);
+    const message = await Message.create(body);
+    return res.status(201).json(message);
   } catch (error) {
     console.error(error);
 
@@ -20,7 +20,7 @@ const createChat = async (req, res) => {
   }
 };
 
-const getChatsByGroupId = async (req, res) => {
+const getMessagesByGroupId = async (req, res) => {
   try {
     const { groupId } = req.params;
 
@@ -29,8 +29,8 @@ const getChatsByGroupId = async (req, res) => {
       return res.status(400).json({ message: "Invalid input" });
     }
 
-    const chats = await Chat.findAll({ where: { groupId } });
-    return res.status(200).json(chats);
+    const messages = await Message.findAll({ where: { groupId } });
+    return res.status(200).json(messages);
   } catch (error) {
     console.error(error);
 
@@ -41,6 +41,6 @@ const getChatsByGroupId = async (req, res) => {
 };
 
 module.exports = {
-  createChat,
-  getChatsByGroupId,
+  createMessage,
+  getMessagesByGroupId,
 };

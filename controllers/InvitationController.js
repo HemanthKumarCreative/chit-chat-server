@@ -20,17 +20,17 @@ const createInvitation = async (req, res) => {
   }
 };
 
-const getInvitationsByUserId = async (req, res) => {
+const getInvitationsByRecieverId = async (req, res) => {
   try {
-    const { userId } = req.params;
+    const { recieverId } = req.params;
 
     // Input Validation
-    if (!userId) {
+    if (!recieverId) {
       return res.status(400).json({ message: "Invalid input" });
     }
 
     const invitations = await Invitation.findAll({
-      where: { userId },
+      where: { recieverId },
     });
     return res.status(200).json(invitations);
   } catch (error) {
@@ -45,10 +45,10 @@ const getInvitationsByUserId = async (req, res) => {
 const respondToInvitation = async (req, res) => {
   try {
     const { invitationId } = req.params;
-    const { status } = req.body;
+    const { invitationStatus } = req.body;
 
     // Input Validation
-    if (!invitationId || !status) {
+    if (!invitationId || !invitationStatus) {
       return res.status(400).json({ message: "Invalid input" });
     }
 
@@ -58,11 +58,11 @@ const respondToInvitation = async (req, res) => {
       return res.status(404).json({ message: "Invitation Not Found" });
     }
 
-    await invitation.update({ invitationStatus: status });
+    await invitation.update({ invitationStatus });
 
     return res
       .status(200)
-      .json({ message: `Invitation ${status} successfully` });
+      .json({ message: `Invitation ${invitationStatus} successfully` });
   } catch (error) {
     console.error(error);
 
@@ -74,6 +74,6 @@ const respondToInvitation = async (req, res) => {
 
 module.exports = {
   createInvitation,
-  getInvitationsByUserId,
+  getInvitationsByRecieverId,
   respondToInvitation,
 };

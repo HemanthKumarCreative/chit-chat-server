@@ -33,9 +33,18 @@ const getGroupsByUserId = async (req, res) => {
 
     const groups = await Group.findAll({
       where: {
-        groupMembers: {
-          [Op.contains]: [userId],
-        },
+        [Op.or]: [
+          {
+            groupMembers: {
+              [Op.contains]: [userId],
+            },
+          },
+          {
+            groupAdmins: {
+              [Op.contains]: [userId],
+            },
+          },
+        ],
       },
     });
 
@@ -74,13 +83,13 @@ const getGroupByGroupId = async (req, res) => {
   }
 };
 
-const addUserAsGroupAdmin = async (req, res) => {
+const addUserToGroup = async (req, res) => {
   try {
     const { groupId } = req.params;
-    const { userId } = req.body;
+    const { userId, role } = req.body;
 
     // Input Validation
-    if (!groupId || !userId) {
+    if (!groupId || !userId || !role) {
       return res.status(400).json({ message: "Invalid input" });
     }
 
@@ -90,14 +99,24 @@ const addUserAsGroupAdmin = async (req, res) => {
       return res.status(404).json({ message: "Group not found" });
     }
 
-    const { groupAdmins } = group;
+    const { groupMembers, groupAdmins } = group;
+    if (role === "member") {
+      if (Array.isArray(groupMembers) && !groupMembers.includes(userId)) {
+        await group.update({ groupMembers: [...groupMembers, userId] });
+        return res.status(201).json({ message: "User added as group member" });
+      }
 
-    if (Array.isArray(groupAdmins) && !groupAdmins.includes(userId)) {
-      await group.update({ groupAdmins: [...groupAdmins, userId] });
-      return res.status(201).json({ message: "User added as group admin" });
+      return res
+        .status(200)
+        .json({ message: "User is already a group member" });
+    } else {
+      if (Array.isArray(groupAdmins) && !groupAdmins.includes(userId)) {
+        await group.update({ groupAdmins: [...groupAdmins, userId] });
+        return res.status(201).json({ message: "User added as group admin" });
+      }
+
+      return res.status(200).json({ message: "User is already a group admin" });
     }
-
-    return res.status(200).json({ message: "User is already a group admin" });
   } catch (error) {
     console.error(error);
 
@@ -149,6 +168,6 @@ module.exports = {
   createGroup,
   getGroupsByUserId,
   getGroupByGroupId,
-  addUserAsGroupAdmin,
+  addUserToGroup,
   removeUserFromGroup,
 };
