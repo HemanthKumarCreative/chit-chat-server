@@ -128,7 +128,8 @@ const addUserToGroup = async (req, res) => {
 
 const removeUserFromGroup = async (req, res) => {
   try {
-    const { groupId, userId } = req.params;
+    const { groupId } = req.params;
+    const { userId } = req.body;
 
     // Input Validation
     if (!groupId || !userId) {
@@ -149,7 +150,7 @@ const removeUserFromGroup = async (req, res) => {
       );
 
       await group.update({ groupMembers: updatedGroupMembers });
-      return res.status(201).json({ message: "User removed from the group" });
+      return res.status(200).json({ message: "User removed from the group" });
     }
 
     return res
