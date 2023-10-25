@@ -10,6 +10,7 @@ const createMessage = async (req, res) => {
     }
 
     const message = await Message.create(body);
+
     return res.status(201).json(message);
   } catch (error) {
     console.error(error);
