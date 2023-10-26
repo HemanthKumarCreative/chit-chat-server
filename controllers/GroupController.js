@@ -103,7 +103,7 @@ const addUserToGroup = async (req, res) => {
     if (role === "member") {
       if (Array.isArray(groupMembers) && !groupMembers.includes(userId)) {
         await group.update({ groupMembers: [...groupMembers, userId] });
-        return res.status(201).json({ message: "User added as group member" });
+        return res.status(200).json({ message: "User added as group member" });
       }
 
       return res
@@ -111,8 +111,13 @@ const addUserToGroup = async (req, res) => {
         .json({ message: "User is already a group member" });
     } else {
       if (Array.isArray(groupAdmins) && !groupAdmins.includes(userId)) {
-        await group.update({ groupAdmins: [...groupAdmins, userId] });
-        return res.status(201).json({ message: "User added as group admin" });
+        await group.update({
+          groupAdmins: [...groupAdmins, userId],
+          groupMembers: groupMembers.filter(
+            (groupMember) => groupMember !== userId
+          ),
+        });
+        return res.status(200).json({ message: "User added as group admin" });
       }
 
       return res.status(200).json({ message: "User is already a group admin" });
