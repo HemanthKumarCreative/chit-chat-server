@@ -23,10 +23,10 @@ const login = async (req, res) => {
 
     await user.update({ isSignedIn: true });
 
-    const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, {
+    const token = jwt.sign({ userId: user.userId }, process.env.JWT_SECRET, {
       expiresIn: "1h",
     });
-    user.id = token;
+    user.userId = token;
     res.cookie("token", token, { httpOnly: true });
 
     res.status(200).json({ message: "Login successful", user, token });
