@@ -11,6 +11,7 @@ const messageRouter = require("./routes/messages");
 const groupRouter = require("./routes/groups");
 const invitationRouter = require("./routes/invitations");
 const userRouter = require("./routes/users");
+const passwordRouter = require("./routes/passwords");
 const AWS = require("aws-sdk");
 
 AWS.config.update({
@@ -88,3 +89,4 @@ app.use("/api/messages", messageRouter);
 app.use("/api/groups", groupRouter);
 app.use("/api/invitations", invitationRouter);
 app.use("/api/users", userRouter);
+app.use("/api/passwords", passwordRouter);
