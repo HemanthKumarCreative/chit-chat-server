@@ -1,5 +1,6 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../database");
+const Group = require("../models/Group");
 
 const Invitation = sequelize.define("invitations", {
   invitationId: {
@@ -30,3 +31,6 @@ const Invitation = sequelize.define("invitations", {
 });
 
 module.exports = Invitation;
+
+Group.hasMany(Invitation, { foreignKey: "groupId" });
+Invitation.belongsTo(Group, { foreignKey: "groupId" });

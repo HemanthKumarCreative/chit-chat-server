@@ -4,7 +4,7 @@ const sequelize = require("./database");
 require("dotenv").config();
 const socketIo = require("socket.io");
 const fs = require("fs");
-
+const { job } = require("./utils/cronJob");
 const signupRouter = require("./routes/signup");
 const loginRouter = require("./routes/login");
 const messageRouter = require("./routes/messages");
@@ -25,7 +25,7 @@ const app = express();
 
 const multer = require("multer");
 const upload = multer({ dest: "uploads/" });
-
+job.start();
 app.use(
   cors({
     origin: "*",
